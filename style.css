@@ -1,0 +1,150 @@
+body{
+    font-family: "Avenir Next";
+}
+
+.header{
+    background-color: #2A73D9;
+    color: #fff;
+    height: 90px;
+}
+
+.header-logo{
+    float: left;
+    font-size: 36px;
+    padding: 20px 40px;
+}
+
+.header-nav li{
+    float: left;
+    list-style: none;
+    padding: 30px 30px;
+}
+
+.main{
+    border: 1px solid black;
+    padding: 10px 80px 80px;
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+a:hover {
+    color: hotpink;
+  }
+
+button{
+    height: 40px;
+    border-radius: 4px;
+    width: 440px;
+    border: none;
+    transition-duration: 0.4s;
+
+}
+
+.kompres{
+    background-color: dodgerblue;
+    color: white;
+    font-size: large;
+}
+
+.kompres:hover{
+    background-color: #1873CC; 
+    color: white;
+}
+
+.unduh{
+    background-color: #04AA6D;
+    color: white;
+    font-size: large;
+    margin-top: 5px;
+}
+
+.unduh:hover{
+    background-color:#038857;
+    color: white;
+}
+
+.flex {
+    display: flex;
+}
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.right{
+    float: left;
+    height: 400px;
+    width: 50%;
+    margin-top: 32px;
+}
+
+.left{
+    float: left;    
+    height: 400px;
+    width: 50%;
+    margin: 32px;
+}
+
+
+.contents{
+    height: 500px;
+    margin-top: 100px;
+}
+
+.section-title{
+    border-bottom: 2px solid #dee7ec;
+    font-size: 28px;
+    padding-bottom: 15px;
+    margin-bottom: 50px;
+}
+
+.contents-item{
+    float: left;
+    margin-right: 20px;
+}
+
+.contents-item p{
+    font-size: 24px;
+    margin-top: 30px;
+}
+
+.contact-form{
+    padding-top: 50px;
+}
+
+input, textarea{
+    width: 400px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    padding: 20px;
+    font-size: 18px;
+    border: 2px solid #dee7ec;
+}
+
+.contact-submit{
+    background-color: #dee7ec;
+    color: #889eab;
+}
+
+.footer{
+    margin-top: 10px;
+    background-color: #2A73D9;
+    color: #fff;
+    height: 120px;
+    padding: 40px;
+}
+
+.footer-logo{
+    float: left;
+    font-size: 32px;
+}
+
+.footer-nav{
+    float: right;
+    padding-bottom: 20px;
+}
+
+.footer-nav li{
+    list-style: none;
+    font-size: larger;
+}

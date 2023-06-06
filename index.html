@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hilman Suhendar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">Compression</div>
+        <div class="header-nav">
+            <ul>
+                <li><a href="#image">Image Compression</a></li>
+                <li><a href="#audio">Audio Compression</a></li>
+                <li><a href="#tentang">Tentang</a></li>
+          </ul>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="contents">
+            <h3 class="section-title" id="image">Image Compression</h3>
+            <div class="flex"> 
+            <div class="contents-item left">
+                <p>Masukan File</p>
+                <input type="file" id="imageInput" accept="image/*">
+                <br>
+                <button class="kompres" onclick="compressImage()">Kompres Gambar</button>
+                <br>
+                <button class="unduh"><a href="#" download id="downloadImageLink" style="display: none;">Download Gambar Kompresi</a></button>
+            </div>
+            <div class="contents-item right">
+                <p>Preview Gambar</p>
+                <img src="" id="previewImage" style="max-width: 300px; max-height: 300px;">
+            </div>
+            </div>
+        </div>
+
+        <div class="contents">
+            <h3 class="section-title" id="audio">Audio Compression</h3>
+            <div class="flex"> 
+            <div class="contents-item left">
+                    <p>Masukan File</p>
+                    <input type="file" id="fileInput" accept="audio/*">
+                <br>
+                
+                <br>
+                <button class="kompres" onclick="compressAudio()">Kompres Audio</button>
+                <br>
+                <button class="unduh"><a href="#" download id="downloadLink" style="display: none;">Download Audio Kompresi</a></button>
+
+            </div>
+            <div class="contents-item right">
+                <p>Preview Audio</p>
+                <audio src="" id="previewAudio" controls></audio>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-logo" id="tentang">Praktikum Sistem Multimedia</div>
+        <div class="footer-nav">
+            <ul>
+                <li>Hilman Suhendar</li>
+                <li>1207050045</li>
+                <li>Informatika G</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function compressImage() {
+            var imageInput = document.getElementById('imageInput');
+            var file = imageInput.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = document.createElement('img');
+                img.src = e.target.result;
+
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(function(blob) {
+                        var compressedImage = new File([blob], file.name, { type: file.type });
+
+                        var downloadImageLink = document.getElementById('downloadImageLink');
+                        downloadImageLink.href = URL.createObjectURL(compressedImage);
+                        downloadImageLink.download = 'kompresi_' + file.name;
+                        downloadImageLink.style.display = 'block';
+
+                        var previewImage = document.getElementById('previewImage');
+                        previewImage.src = URL.createObjectURL(compressedImage);
+                    }, file.type, 0.6);
+                };
+            };
+
+            reader.readAsDataURL(file);
+        }
+        function compressAudio() {
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContext.decodeAudioData(e.target.result, function(buffer) {
+                    var source = audioContext.createBufferSource();
+                    source.buffer = buffer;
+
+                    var scriptNode = audioContext.createScriptProcessor(4096, 1, 1);
+
+                    var compressor = audioContext.createDynamicsCompressor();
+                    compressor.threshold.value = -30;
+                    compressor.knee.value = 10;
+                    compressor.ratio.value = 12;
+                    compressor.attack.value = 0;
+                    compressor.release.value = 0.25;
+
+                    source.connect(scriptNode);
+                    scriptNode.connect(compressor);
+                    compressor.connect(audioContext.destination);
+
+                    var compressedBuffer = audioContext.createBuffer(1, buffer.length, audioContext.sampleRate);
+                    scriptNode.onaudioprocess = function(event) {
+                        var inputBuffer = event.inputBuffer;
+                        var outputBuffer = event.outputBuffer;
+                        for (var channel = 0; channel < outputBuffer.numberOfChannels; channel++) {
+                            var inputData = inputBuffer.getChannelData(channel);
+                            var outputData = outputBuffer.getChannelData(channel);
+                            for (var sample = 0; sample < inputBuffer.length; sample++) {
+                                outputData[sample] = inputData[sample];
+                            }
+                        }
+                    };
+
+                    source.start();
+                    setTimeout(function() {
+                        source.stop();
+
+                        audioContext.close();
+
+                        var offlineContext = new OfflineAudioContext(1, compressedBuffer.length, audioContext.sampleRate);
+                        var offlineSource = offlineContext.createBufferSource();
+                        offlineSource.buffer = compressedBuffer;
+
+                        offlineSource.connect(offlineContext.destination);
+                        offlineSource.start();
+                        offlineContext.startRendering().then(function(renderedBuffer) {
+                            var compressedAudio = new File([renderedBuffer], file.name, { type: file.type });
+
+                            var downloadLink = document.getElementById('downloadLink');
+                            downloadLink.href = URL.createObjectURL(compressedAudio);
+                            downloadLink.download = 'kompresi_' + file.name;
+                            downloadLink.style.display = 'block';
+                        });
+
+                        var previewAudio = document.getElementById('previewAudio');
+                        previewAudio.src = URL.createObjectURL(compressedAudio);
+                    }, buffer.duration * 1000);
+                });
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+
+</body>
+</html>
